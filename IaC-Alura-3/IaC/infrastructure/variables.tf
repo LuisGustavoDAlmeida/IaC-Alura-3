@@ -14,11 +14,11 @@ variable "security_group" {
     type = string
 }
 
-variable "minimo" {
+variable "min" {
     type = number
 }
 
-variable "maximo" {
+variable "max" {
     type = number
 }
 

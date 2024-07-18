@@ -4,9 +4,9 @@ module "aws-dev" {
     region_aws = "us-east-1"
     key = "IaC-DEV"
     security_group = "DEV"
-    minimo = 0
-    maximo = 1
     nomeGrupo = "DEV"
+    min = 0
+    max = 1
 }
 
 output "IP" {
