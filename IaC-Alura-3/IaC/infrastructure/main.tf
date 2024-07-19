@@ -24,8 +24,15 @@ resource "aws_launch_template" "maquina" {
         Name = "Terraform Ansible Python - Infra Elastica"
     }
     security_group_names = [var.security_group]
-    user_data = filebase64("ansible.shS")
+    user_data = var.prod ? filebase64("ansible.sh") : ""
 }
+# if(var.producao) {
+#       filebase64("ansible.sh");
+#   } else {
+#       "";
+#   }
+#
+#
 
 resource "aws_key_pair" "chaveSSH" {
     key_name = var.key
@@ -46,7 +53,7 @@ resource "aws_autoscaling_group" "grupo" { ## Configurar grupo de escalamento au
       id = aws_launch_template.maquina.id
       version = "$Latest"
     }
-    target_group_arns = [aws_lb_target_group.target_load_balancer.arn]
+    target_group_arns = var.prod ? [aws_lb_target_group.target_load_balancer[0].arn] : []
 }
 
 resource "aws_default_subnet" "subnet_1" {
@@ -60,6 +67,7 @@ resource "aws_default_subnet" "subnet_2" {
 resource "aws_lb" "load_balancer" {
     internal = false
     subnets = [aws_default_subnet.subnet_1.id, aws_default_subnet.subnet_2.id]
+    count = var.prod ? 1 : 0
 }
 
 resource "aws_lb_target_group" "target_load_balancer" {
@@ -67,18 +75,20 @@ resource "aws_lb_target_group" "target_load_balancer" {
     port = "8000"
     protocol = "HTTP"
     vpc_id = default_vpc.id
+    count = var.prod ? 1 : 0
 }
 
 resource "aws_default_vpc" "default_vpc" {}
 
 resource "aws_lb_listener" "lb_entrance" {
-    load_balancer_arn = aws_lb.load_balancer.arn
+    load_balancer_arn = aws_lb.load_balancer[0].arn
     port = "8000"
     protocol =  "HTTP"
     default_action {
         type = "forward" # Ele pega a requisição e passa pra frente
-        target_group_arn = aws_lb_target_group.target_load_balancer.arn 
+        target_group_arn = aws_lb_target_group.target_load_balancer[0].arn 
     }
+    count = var.prod ? 1 : 0 
 }
 
 resource "aws_autoscaling_policy" "prod_scale" {
@@ -87,7 +97,9 @@ resource "aws_autoscaling_policy" "prod_scale" {
     policy_type = "TargetTrackingScaling"
     target_tracking_configuration {
       predefined_metric_specification {
-        predefined_metric_type = "ASGAvarageCPUUtilization"
+        predefined_metric_type = "ASGAverageCPUUtilization"
       }
+      target_value = 50.0
     }
+    count = var.prod ? 1 : 0
 }

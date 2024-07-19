@@ -25,3 +25,7 @@ variable "max" {
 variable "nomeGrupo" {
     type = string
 }
+
+variable "prod" {
+    type = bool
+}

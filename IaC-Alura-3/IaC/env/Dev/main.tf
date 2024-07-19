@@ -7,8 +7,9 @@ module "aws-dev" {
     nomeGrupo = "DEV"
     min = 0
     max = 1
+    prod = false
 }
 
-output "IP" {
-    value = module.aws-dev.Ip_publico
-}
+# output "IP" {
+#     value = module.aws-dev.Ip_publico
+# }
