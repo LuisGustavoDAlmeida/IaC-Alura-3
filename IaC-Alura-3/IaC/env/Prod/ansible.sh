@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd /home/ubuntu #Indo para a o diretório correto
 curl https://bootstrap.pypa.io/get-pip.py -o get pip.py # Pegando o arquivo
 sudo python3 get-pip.py # Executando o arquivo pego acima

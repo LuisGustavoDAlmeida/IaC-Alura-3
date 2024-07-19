@@ -80,3 +80,14 @@ resource "aws_lb_listener" "lb_entrance" {
         target_group_arn = aws_lb_target_group.target_load_balancer.arn 
     }
 }
+
+resource "aws_autoscaling_policy" "prod_scale" {
+    name = "terraform_scale"
+    autoscaling_group_name = var.nomeGrupo
+    policy_type = "TargetTrackingScaling"
+    target_tracking_configuration {
+      predefined_metric_specification {
+        predefined_metric_type = "ASGAvarageCPUUtilization"
+      }
+    }
+}
